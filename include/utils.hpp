@@ -40,7 +40,37 @@ public:
     }
 };
 
+struct SocketRAII{
+    explicit SocketRAII(int fd = -1) : fd_(fd) {}
+    ~SocketRAII() {
+        close_fd(fd_);
+    }
+
+    SocketRAII(const SocketRAII&) = delete;
+    SocketRAII& operator=(const SocketRAII&) = delete;
+    SocketRAII(SocketRAII&& other) noexcept : fd_(other.fd_) {
+        other.fd_ = -1;
+    }
+    SocketRAII& operator=(SocketRAII&& other) noexcept {
+        if (this != &other) {
+            close_fd(fd_);
+            fd_ = other.fd_;
+            other.fd_ = -1;
+        }
+        return *this;
+    }
+    int get() const { return fd_; }
+private:
+    int fd_;
+    void close_fd(int fd) {
+        if (fd != -1) {
+            ::close(fd);
+        }
+    }
+};
+
 
 bool set_reuseaddr(int fd);
+bool set_non_blocking(int fd);
 std::string get_current_time();
 void print_stats(std::string_view server_name, int active_connections, long long total_messages);

@@ -1,4 +1,5 @@
 #include "utils.hpp"
+
 bool set_reuseaddr(int fd){// allow address reuse
     int optval = 1;
     return ::setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) == 0;
@@ -19,4 +20,10 @@ std::string get_current_time(){
 
 void print_stats(std::string_view server_name, int active_connections, long long total_messages){
     Logger::info("(", get_current_time(), ")", server_name, " - active connections: ", active_connections, " - total messages: ", total_messages);
+}
+
+bool set_non_blocking(int fd) {
+    int flags = fcntl(fd, F_GETFL, 0);
+    if (flags == -1) return false;
+    return fcntl(fd, F_SETFL, flags | O_NONBLOCK) != -1;
 }

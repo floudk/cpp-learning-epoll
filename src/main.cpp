@@ -1,5 +1,4 @@
 #include "server.hpp"
-#include "utils.hpp"
 
 
 Server* server = nullptr;
@@ -29,14 +28,17 @@ int main(int argc, char* argv[]) {
     }
 
     uint16_t port = (argc > 2) ? static_cast<uint16_t>(std::stoi(argv[2])) : 18081;
-    
+    Logger::info("Using port ", port, " for server ", argv[1]);
     ServerKind kind = ServerKind::Bio;
-    if (argv[1] == "select") {
+    if (std::string_view(argv[1]) == "select") {
+        Logger::info("Using select server");
         kind = ServerKind::Select;
-    } else if (argv[1] == "poll") {
+    } else if (std::string_view(argv[1]) == "poll") {
         kind = ServerKind::Poll;
-    } else if (argv[1] == "epoll") {
+    } else if (std::string_view(argv[1]) == "epoll") {
         kind = ServerKind::Epoll;
+    }else if (std::string_view(argv[1]) == "iouring") {
+        kind = ServerKind::IOUring;
     }
     Server the_server = Server::make(kind);
     server = &the_server;
