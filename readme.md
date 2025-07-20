@@ -31,3 +31,51 @@ The `test/client.cpp` offers a simple client implementation to test the server.
 `./benchmark-client -c 2000 -m 100 -i 5 -p 18081` can be used to run the client against the server, where: -c is the number of clients, -m is the number of messages per client, -i is the interval between messages, and -p is the port number of the server.  
 
 After running the client, the result will show in standard output.
+
+### Results
+
+run
+
+`./benchmark-client -c 4000 -m 300 -i 10`
+
+```
+=== BIO Benchmark Results ===
+Duration: 4339ms
+Connections - Success: 4000, Failed: 0
+Messages - Success: 1200000, Failed: 0
+Bytes - Sent: 41235000, Received: 56923869
+Throughput: 276561.42 msg/s
+Bandwidth - Sent: 72.50 Mbps, Received: 100.09 Mbps
+
+=== Select Benchmark Results ===
+Starting benchmark with 4000 clients, 300 messages each
+Target: 127.0.0.1:18081
+
+
+=== POLL Benchmark Results ===
+Duration: 8101ms
+Connections - Success: 4000, Failed: 0
+Messages - Success: 1200000, Failed: 0
+Bytes - Sent: 41235000, Received: 56923890
+Throughput: 148129.86 msg/s
+Bandwidth - Sent: 38.83 Mbps, Received: 53.61 Mbps
+
+=== EPOLL Benchmark Results ===
+Duration: 8004ms
+Connections - Success: 4000, Failed: 0
+Messages - Success: 1200000, Failed: 0
+Bytes - Sent: 41235000, Received: 55723890
+Throughput: 149925.04 msg/s
+Bandwidth - Sent: 39.31 Mbps, Received: 53.12 Mbps
+
+=== IOUring Benchmark Results ===
+Duration: 4314ms
+Connections - Success: 4000, Failed: 0
+Messages - Success: 1200000, Failed: 0
+Bytes - Sent: 41235000, Received: 56923859
+Throughput: 278164.12 msg/s
+Bandwidth - Sent: 72.92 Mbps, Received: 100.67 Mbps
+
+```
+
+In summary, both multithreaded blocking I/O (BIO) and Linux’s modern asynchronous interface (io_uring) deliver the highest message throughput—io_uring even slightly outperforms BIO while using a single thread.
